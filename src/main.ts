@@ -10,7 +10,7 @@ async function bootstrap() {
 	const logger: LogLevel[] = ['log', 'error', 'warn', 'debug', 'verbose'];
 	const app = await NestFactory.create(AppModule, { logger });
 
-	// Set config
+	// Set config.
 	const configService: ConfigService = app.get(ConfigService);
 	app.enableCors({
 		origin: configService.get('FRONTEND_URL'),
