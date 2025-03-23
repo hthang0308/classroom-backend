@@ -1,0 +1,47 @@
+import { Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { MailerService } from '@nestjs-modules/mailer';
+
+@Injectable()
+export class MailService {
+  constructor(
+    private mailerService: MailerService,
+    private configService: ConfigService,
+  ) {}
+
+  async sendUserConfirmation(user, token: string) {
+    const url = `${this.configService.get(
+      'FRONTEND_URL',
+    )}/auth/confirm?token=${token}`;
+
+    await this.mailerService.sendMail({
+      to: user.email,
+      subject: 'Confirm your email at TAT-Classroom',
+      template: './confirmation',
+      context: {
+        email: user.email,
+        url: url,
+      },
+    });
+  }
+
+  async sendInviteEmail(
+    emailToInvite: string,
+    url: string,
+    groupName: string,
+    inviter: any,
+  ) {
+    await this.mailerService.sendMail({
+      to: emailToInvite,
+      subject: `You have been invited to join ${groupName} group`,
+      template: './invite-to-group',
+      context: {
+        emailToInvite,
+        url,
+        groupName,
+        inviterName: inviter.name,
+        inviterEmail: inviter.email,
+      },
+    });
+  }
+}
