@@ -1,6 +1,6 @@
+import { MailerService } from '@nestjs-modules/mailer';
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { MailerService } from '@nestjs-modules/mailer';
 
 @Injectable()
 export class MailService {
@@ -41,6 +41,22 @@ export class MailService {
         groupName,
         inviterName: inviter.name,
         inviterEmail: inviter.email,
+      },
+    });
+  }
+
+  async sendPasswordResetEmail(user: any, token: string) {
+    const url = `${this.configService.get(
+      'FRONTEND_URL',
+    )}/auth/reset-password?token=${token}`;
+
+    await this.mailerService.sendMail({
+      to: user.email,
+      subject: 'Reset your password at TAT-Classroom',
+      template: './reset-password',
+      context: {
+        email: user.email,
+        url: url,
       },
     });
   }

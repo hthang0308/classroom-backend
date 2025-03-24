@@ -1,14 +1,9 @@
 import {
-  IsString,
-  IsNotEmpty,
-  IsEmail,
-  IsEnum,
-  IsNotIn,
-  IsMongoId,
-  Matches,
-  MaxLength,
-  Validate,
-  IsOptional,
+    IsEmail,
+    IsNotEmpty,
+    IsOptional,
+    IsString,
+    MaxLength
 } from 'class-validator';
 
 export class LoginDto {
@@ -38,5 +33,25 @@ export class ChangePasswordDto {
   @IsString()
   @IsNotEmpty()
   @MaxLength(20)
+  newPassword: string;
+}
+
+export class ForgotPasswordDto {
+  @IsNotEmpty()
+  @IsEmail()
+  email: string;
+}
+
+export class ResetPasswordDto {
+  @IsNotEmpty()
+  @IsString()
+  token: string;
+
+  @IsNotEmpty()
+  @IsString()
+  @MaxLength(20)
+  // @Matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/, {
+  //   message: 'Password must contain at least 8 characters, including UPPER/lowercase and numbers',
+  // })
   newPassword: string;
 }

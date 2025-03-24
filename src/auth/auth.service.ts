@@ -6,7 +6,7 @@ import { MailService } from '../mail/mail.service';
 import { UserService } from '../user/user.service';
 import { hashPassword, validatePassword } from '../utils';
 
-import { LoginDto } from './dtos/auth.dto';
+import { ForgotPasswordDto, LoginDto, ResetPasswordDto } from './dtos/auth.dto';
 
 @Injectable()
 export class AuthService {
@@ -131,5 +131,39 @@ export class AuthService {
   async confirmAccount(token) {
     const user = await this.userService.verifyEmail(token);
     return user;
+  }
+
+  async forgotPassword(data: ForgotPasswordDto) {
+    const user = await this.userService.findByEmail(data.email);
+
+    if (!user) {
+      throw new BadRequestException('Email not found');
+    }
+
+    // Generate reset token
+    const resetToken = this.userService.generateJWTAsVerificationCode(user);
+
+    // Send reset password email
+    await this.mailService.sendPasswordResetEmail(user, resetToken);
+
+    return {
+      message: 'Password reset instructions have been sent to your email',
+    };
+  }
+
+  async resetPassword(data: ResetPasswordDto) {
+    const user = await this.userService.verifyResetToken(data.token);
+
+    if (!user) {
+      throw new BadRequestException('Invalid or expired reset token');
+    }
+
+    // Update password
+    user.password = hashPassword(data.newPassword);
+    await this.userService.update(user._id, user);
+
+    return {
+      message: 'Password has been reset successfully',
+    };
   }
 }

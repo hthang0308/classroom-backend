@@ -1,4 +1,4 @@
-import { Injectable, BadRequestException } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
@@ -8,7 +8,7 @@ import { GroupModel } from '../group/schemas/group.schema';
 import { hashPassword } from '../utils';
 
 import { UpdateAccountDto } from './dtos/update-account.dto';
-import { UserModel, UserDocument } from './schemas/user.schema';
+import { UserDocument, UserModel } from './schemas/user.schema';
 @Injectable()
 export class UserService {
   constructor(
@@ -122,5 +122,18 @@ export class UserService {
     user.password = await hashPassword(data.newPassword);
     await user.save();
     return user;
+  }
+
+  async verifyResetToken(resetToken: string) {
+    try {
+      const decoded = this.jwtService.verify(resetToken);
+      const user = await this.userModel.findOne({ email: decoded.email });
+      if (!user) {
+        throw new BadRequestException('User not found');
+      }
+      return user;
+    } catch (error) {
+      throw new BadRequestException('Invalid or expired reset token');
+    }
   }
 }
