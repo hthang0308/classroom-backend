@@ -28,12 +28,9 @@ export class RedisService
 	}
 
 	async connect() {
-		const host = this.configService.get('REDIS_HOST');
-		const port = this.configService.get('REDIS_PORT');
-		const username = this.configService.get('REDIS_USERNAME');
-		const password = this.configService.get('REDIS_PASSWORD');
+		const uri = this.configService.get('REDIS_URI');
 		const client: RedisClientType = createClient({
-			url: `redis://${username}:${password}@${host}:${port}`,
+			url: uri,
 			socket: {
 				tls: true
 			},

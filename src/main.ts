@@ -1,21 +1,15 @@
-import { NestFactory } from '@nestjs/core';
 import { ConfigService } from '@nestjs/config';
-const cookieParser = require('cookie-parser');
+import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
+const cookieParser = require('cookie-parser');
 
-import 'dotenv/config';
 import { LogLevel, ValidationPipe } from "@nestjs/common";
+import 'dotenv/config';
 
 async function bootstrap() {
 	const logger: LogLevel[] = ['log', 'error', 'warn', 'debug', 'verbose'];
 	const app = await NestFactory.create(AppModule, { logger });
 	const configService: ConfigService = app.get(ConfigService);
-
-	console.log(configService.get('ENABLE_CORS'))
-	console.log(configService.get('FRONTEND_URL'))
-	console.log(configService.get('BASE_URL'))
-	console.log(configService.get('MONGODB_URI'))
-	console.log(configService.get('REDIS_HOST'))
 
 	// Set config
 	const isDisableCors = configService.get('ENABLE_CORS') === 'false';
